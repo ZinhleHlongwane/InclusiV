@@ -1,0 +1,45 @@
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.azure/
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+**/bin/
+**/obj/
+.vs/
+TestResults/
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.db
+*.sqlite
+*.log
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.zip
+
+# Generated Python package metadata
+**/*.egg-info/
+
+# Python environments and caches
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.ruff_cache/
+
+# Build outputs
+**/bin/
+**/obj/
+**/node_modules/
+**/.next/

@@ -1,0 +1,12 @@
+# Security Principles
+- Never commit secrets or production credentials.
+- Use Key Vault or an appropriate local secret store.
+- Use managed identities for Azure access where supported.
+- Enforce user-level authorisation in the backend, not in prompts.
+- Give each agent only the tools and data it needs.
+- Validate every tool argument server-side.
+- Treat user content and retrieved documents as untrusted.
+- Never execute arbitrary code or URLs supplied by an LLM.
+- Require explicit confirmation before consequential actions.
+- Do not rely on an LLM for arithmetic, access control or transaction state.
+- Avoid logging raw financial records or unnecessary personal data.

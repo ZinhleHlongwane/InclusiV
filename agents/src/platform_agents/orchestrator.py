@@ -20,9 +20,8 @@ class AgentIntent(StrEnum):
 class AgentOrchestrator:
     """Plan and coordinate one or more specialist agents for a chat request.
 
-    Routing rules are deterministic and deliberately separated from execution.
-    A future model-assisted planner can replace classify_intents without
-    changing the specialist-agent response contracts.
+    Intent planning is separated from execution. The optional model planner
+    returns a validated plan; deterministic keyword routing remains the fallback.
     """
 
     BUDGET_TERMS = (

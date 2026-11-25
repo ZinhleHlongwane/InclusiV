@@ -1,8 +1,11 @@
 from fastapi import APIRouter, HTTPException
+from platform_agents.agents.budget_planning import BudgetPlanningAgent
 from platform_agents.agents.payments import PaymentsAgent
 from platform_agents.agents.wellbeing import FinancialWellbeingAgent
 from platform_agents.client import BackendApiClient
 from platform_agents.models import (
+    BudgetPlanningRequest,
+    BudgetPlanningResponse,
     ChatRequest,
     ChatResponse,
     FinancialAdviceRequest,
@@ -21,6 +24,12 @@ AGENTS = [
         "name": "Financial Wellbeing Agent",
         "status": "active",
         "responsibility": "Spending explanations, budgeting, vulnerability alerts and savings guidance.",
+    },
+    {
+        "id": "budget-planning",
+        "name": "Budget Planning Agent",
+        "status": "active",
+        "responsibility": "Monthly budget reviews, category spending limits and practical spending recommendations.",
     },
     {
         "id": "payments-transactions",
@@ -73,6 +82,19 @@ async def explain_spending(request: SpendingExplanationRequest) -> SpendingExpla
         user_id=request.user_id,
         category=request.category,
         summary=summary,
+    )
+
+
+@router.post("/agents/budget-planning/plan", response_model=BudgetPlanningResponse)
+async def create_budget_plan(request: BudgetPlanningRequest) -> BudgetPlanningResponse:
+    summary = request.financial_context
+    if summary is None:
+        summary = await backend_client.get_financial_summary(request.user_id)
+
+    return BudgetPlanningAgent.create_plan(
+        user_id=request.user_id,
+        summary=summary,
+        query=request.query,
     )
 
 

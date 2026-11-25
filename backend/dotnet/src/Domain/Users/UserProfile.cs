@@ -4,7 +4,7 @@ public sealed class UserProfile
 {
     public Guid Id { get; }
     public string Email { get; }
-    public string FullName { get; }
+    public string FullName { get; private set; }
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset? UpdatedAt { get; private set; }
 

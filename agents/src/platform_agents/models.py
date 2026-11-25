@@ -68,6 +68,23 @@ class FinancialSummaryModel(BaseModel):
     model_config = {"populate_by_name": True}
 
 
+class BudgetPlanningRequest(BaseModel):
+    user_id: str
+    query: str | None = None
+    financial_context: FinancialSummaryModel | None = None
+
+
+class BudgetPlanningResponse(BaseModel):
+    agent_id: str = "budget-planning"
+    user_id: str
+    headline: str
+    overview: str
+    recommendations: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
 class FinancialAdviceRequest(BaseModel):
     user_id: str
     query: str | None = None

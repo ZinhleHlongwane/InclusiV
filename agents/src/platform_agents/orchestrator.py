@@ -6,6 +6,7 @@ from platform_agents.agents.savings_goals import SavingsGoalsAgent
 from platform_agents.agents.wellbeing import FinancialWellbeingAgent
 from platform_agents.client import BackendApiClient
 from platform_agents.models import ChatRequest, ChatResponse, FinancialSummaryModel
+from platform_agents.intent_planner import IntentExecutionPlan, IntentPlanner
 
 
 class AgentIntent(StrEnum):
@@ -40,8 +41,13 @@ class AgentOrchestrator:
         "simulate payment", "simulate a payment", "make a payment", "pay ", "send money", "transfer money",
     )
 
-    def __init__(self, backend_client: BackendApiClient | None = None) -> None:
+    def __init__(
+        self,
+        backend_client: BackendApiClient | None = None,
+        intent_planner: IntentPlanner | None = None,
+    ) -> None:
         self.backend_client = backend_client or BackendApiClient()
+        self.intent_planner = intent_planner or IntentPlanner()
 
     @classmethod
     def classify_intents(cls, message: str) -> list[AgentIntent]:
@@ -108,7 +114,21 @@ class AgentOrchestrator:
         return "\n".join(parts)
 
     async def handle(self, request: ChatRequest) -> ChatResponse:
-        intents = self.classify_intents(request.message)
+        execution_plan = await self.intent_planner.create_plan(request.message)
+        if execution_plan.needs_clarification:
+            return ChatResponse(
+                agent_id="agent-orchestrator",
+                agent_name="InclusiV Agent Orchestrator",
+                reply=execution_plan.clarification_question or "Could you clarify what kind of financial help you need?",
+                suggestions=[
+                    "Review my monthly budget",
+                    "Review my savings goals",
+                    "Give me an overall financial health review",
+                ],
+                data={"execution_plan": execution_plan.model_dump()},
+            )
+
+        intents = [AgentIntent(intent) for intent in execution_plan.intents]
 
         if intents == [AgentIntent.PAYMENTS]:
             return ChatResponse(
@@ -123,7 +143,7 @@ class AgentOrchestrator:
                     "Simulate R50 payment for Transport",
                     "Review remaining category budgets",
                 ],
-                data={"action": "simulate_payment_prompt"},
+                data={"action": "simulate_payment_prompt", "execution_plan": execution_plan.model_dump()},
             )
 
         summary = await self._get_summary(request)
@@ -177,7 +197,7 @@ class AgentOrchestrator:
                 agent_name=names[intent],
                 reply=formatters[intent](result),
                 suggestions=self._suggestions(intent),
-                data=result.model_dump(),
+                data={**result.model_dump(), "execution_plan": execution_plan.model_dump()},
             )
 
         reply_parts = ["InclusiV coordinated the following specialist reviews."]
@@ -207,6 +227,7 @@ class AgentOrchestrator:
                 "delegated_agents": delegated_agents,
                 "results": agent_results,
                 "failed_agents": failures,
+                "execution_plan": execution_plan.model_dump(),
             },
         )
 

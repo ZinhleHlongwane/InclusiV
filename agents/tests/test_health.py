@@ -9,7 +9,7 @@ def test_health_endpoint() -> None:
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
-    assert data["stage"] == "multi-agent-orchestration"
+    assert data["stage"] == "model-assisted-intent-planning"
 
 
 def test_agent_catalog_contains_active_and_planned_agents() -> None:

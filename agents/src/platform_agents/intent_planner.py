@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 from typing import Any
@@ -17,6 +16,7 @@ class IntentExecutionPlan(BaseModel):
     needs_clarification: bool = False
     clarification_question: str | None = None
     rationale: str = ""
+    planning_mode: str = "model-assisted"
 
 
 class IntentPlanner:
@@ -92,6 +92,7 @@ class IntentPlanner:
             intents=intents,
             confidence=0.5,
             rationale="Deterministic keyword routing fallback.",
+            planning_mode="deterministic-fallback",
         )
 
     async def create_plan(self, message: str) -> IntentExecutionPlan:

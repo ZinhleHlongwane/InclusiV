@@ -1,4 +1,5 @@
-from platform_agents.agents.savings_goals import SavingsGoalsAgent
+import asyncio
+
 from platform_agents.models import (
     ChatRequest,
     FinancialSummaryModel,
@@ -40,7 +41,7 @@ def test_orchestrator_delegates_compound_request_to_two_agents() -> None:
         ],
     )
     orchestrator = AgentOrchestrator()
-    response = __import__("asyncio").run(
+    response = asyncio.run(
         orchestrator.handle(
             ChatRequest(
                 user_id="user-123",

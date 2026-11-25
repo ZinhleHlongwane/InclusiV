@@ -7,11 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Host=localhost;Port=5432;Database=financial_platform;Username=platform_user;Password=change-me-local-only";
 
-builder.Services.AddDbContext<InclusivDbContext>(options =>
+builder.Services.AddDbContext<MaliNovationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<InclusivDbContext>("database");
+    .AddDbContextCheck<MaliNovationDbContext>("database");
 
 var app = builder.Build();
 
@@ -19,7 +19,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("ApplyMigrationsOnStartup", true))
 {
     using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<InclusivDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<MaliNovationDbContext>();
     try
     {
         dbContext.Database.Migrate();

@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Data;
 
-public class InclusivDbContext : DbContext
+public class MaliNovationDbContext : DbContext
 {
-    public InclusivDbContext(DbContextOptions<InclusivDbContext> options)
+    public MaliNovationDbContext(DbContextOptions<MaliNovationDbContext> options)
         : base(options)
     {
     }

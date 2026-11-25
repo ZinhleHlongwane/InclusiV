@@ -11,7 +11,7 @@ public static class UserEndpoints
     {
         var group = routes.MapGroup("/api/users").WithTags("Users");
 
-        group.MapPost("/", async (CreateUserRequest request, InclusivDbContext db) =>
+        group.MapPost("/", async (CreateUserRequest request, MaliNovationDbContext db) =>
         {
             if (string.IsNullOrWhiteSpace(request.Email) || !request.Email.Contains('@'))
                 return Results.BadRequest(new { error = "A valid email address is required." });
@@ -32,7 +32,7 @@ public static class UserEndpoints
             return Results.Created($"/api/users/{user.Id}", response);
         });
 
-        group.MapGet("/{id:guid}", async (Guid id, InclusivDbContext db) =>
+        group.MapGet("/{id:guid}", async (Guid id, MaliNovationDbContext db) =>
         {
             var user = await db.Users.FindAsync(id);
             if (user is null)
@@ -41,7 +41,7 @@ public static class UserEndpoints
             return Results.Ok(new UserProfileResponse(user.Id, user.Email, user.FullName, user.CreatedAt, user.UpdatedAt));
         });
 
-        group.MapGet("/by-email/{email}", async (string email, InclusivDbContext db) =>
+        group.MapGet("/by-email/{email}", async (string email, MaliNovationDbContext db) =>
         {
             var normalizedEmail = email.Trim().ToLowerInvariant();
             var user = await db.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
@@ -51,7 +51,7 @@ public static class UserEndpoints
             return Results.Ok(new UserProfileResponse(user.Id, user.Email, user.FullName, user.CreatedAt, user.UpdatedAt));
         });
 
-        group.MapPut("/{id:guid}", async (Guid id, UpdateUserRequest request, InclusivDbContext db) =>
+        group.MapPut("/{id:guid}", async (Guid id, UpdateUserRequest request, MaliNovationDbContext db) =>
         {
             if (string.IsNullOrWhiteSpace(request.FullName))
                 return Results.BadRequest(new { error = "Full name is required." });

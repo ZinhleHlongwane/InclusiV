@@ -62,7 +62,7 @@ def test_orchestrator_delegates_compound_request_to_multiple_agents() -> None:
     )
 
     assert response.agent_id == "agent-orchestrator"
-    assert response.agent_name == "InclusiV Agent Orchestrator"
+    assert response.agent_name == "MaliNovation Agent Orchestrator"
     assert response.data is not None
     assert response.data["delegated_agents"] == ["budget-planning", "savings-goals"]
     assert "budget-planning" in response.data["results"]
@@ -133,3 +133,32 @@ def test_orchestrator_keeps_successful_agent_result_if_another_fails(monkeypatch
     assert response.data is not None
     assert response.data["delegated_agents"] == ["savings-goals"]
     assert response.data["failed_agents"] == ["Budget Planning Agent"]
+
+
+def test_orchestrator_returns_clarification_without_running_agents() -> None:
+    class ClarifyingPlanner:
+        async def create_plan(self, message: str):
+            from platform_agents.intent_planner import IntentExecutionPlan
+
+            return IntentExecutionPlan(
+                intents=[],
+                confidence=0.4,
+                needs_clarification=True,
+                clarification_question="Are you asking about your budget or savings?",
+                rationale="The request is ambiguous.",
+            )
+
+    response = asyncio.run(
+        AgentOrchestrator(intent_planner=ClarifyingPlanner()).handle(
+            ChatRequest(
+                user_id="user-123",
+                message="Can you help me with it?",
+                financial_context=sample_summary(),
+            )
+        )
+    )
+
+    assert response.agent_id == "agent-orchestrator"
+    assert response.reply == "Are you asking about your budget or savings?"
+    assert response.data is not None
+    assert response.data["execution_plan"]["needs_clarification"] is True

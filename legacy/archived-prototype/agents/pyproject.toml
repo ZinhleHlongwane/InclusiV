@@ -1,7 +1,7 @@
 [project]
-name = "inclusiv-agents"
+name = "malinovation-archived-agents"
 version = "0.1.0"
-description = "A2A agent services for the InclusiV financial-inclusion prototype"
+description = "Archived A2A agent services for the MaliNovation prototype"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

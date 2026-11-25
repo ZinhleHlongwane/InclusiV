@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Api.Data.Migrations;
 
-[DbContext(typeof(InclusivDbContext))]
-partial class InclusivDbContextModelSnapshot : ModelSnapshot
+[DbContext(typeof(MaliNovationDbContext))]
+partial class MaliNovationDbContextModelSnapshot : ModelSnapshot
 {
     protected override void BuildModel(ModelBuilder modelBuilder)
     {

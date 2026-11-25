@@ -16,7 +16,7 @@ def test_agent_catalog_contains_active_and_planned_agents() -> None:
     response = client.get("/v1/agents")
     assert response.status_code == 200
     agents = response.json()["agents"]
-    assert len(agents) == 4
+    assert len(agents) == 6
 
     agent_dict = {a["id"]: a for a in agents}
     assert agent_dict["financial-wellbeing"]["status"] == "active"

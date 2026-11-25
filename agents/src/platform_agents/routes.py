@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from platform_agents.agents.budget_planning import BudgetPlanningAgent
 from platform_agents.agents.payments import PaymentsAgent
+from platform_agents.agents.savings_goals import SavingsGoalsAgent
 from platform_agents.agents.wellbeing import FinancialWellbeingAgent
 from platform_agents.client import BackendApiClient
 from platform_agents.models import (
@@ -10,6 +11,8 @@ from platform_agents.models import (
     ChatResponse,
     FinancialAdviceRequest,
     FinancialAdviceResponse,
+    SavingsGoalsRequest,
+    SavingsGoalsResponse,
     SandboxPaymentRequest,
     SandboxPaymentResponse,
     SpendingExplanationRequest,
@@ -30,6 +33,12 @@ AGENTS = [
         "name": "Budget Planning Agent",
         "status": "active",
         "responsibility": "Monthly budget reviews, category spending limits and practical spending recommendations.",
+    },
+    {
+        "id": "savings-goals",
+        "name": "Savings & Goals Agent",
+        "status": "active",
+        "responsibility": "Savings goal progress, target tracking and realistic contribution guidance.",
     },
     {
         "id": "payments-transactions",
@@ -98,6 +107,19 @@ async def create_budget_plan(request: BudgetPlanningRequest) -> BudgetPlanningRe
     )
 
 
+@router.post("/agents/savings-goals/review", response_model=SavingsGoalsResponse)
+async def review_savings_goals(request: SavingsGoalsRequest) -> SavingsGoalsResponse:
+    summary = request.financial_context
+    if summary is None:
+        summary = await backend_client.get_financial_summary(request.user_id)
+
+    return SavingsGoalsAgent.review_goals(
+        user_id=request.user_id,
+        summary=summary,
+        query=request.query,
+    )
+
+
 @router.post("/agents/payments/simulate", response_model=SandboxPaymentResponse)
 async def simulate_payment(request: SandboxPaymentRequest) -> SandboxPaymentResponse:
     try:
@@ -158,6 +180,39 @@ async def chat(request: ChatRequest) -> ChatResponse:
                 "Explain my spending breakdown",
             ],
             data=plan.model_dump(),
+        )
+
+    # Route savings-goal questions before the general wellbeing fallback.
+    savings_keywords = (
+        "savings goal", "saving goal", "savings progress", "track my savings",
+        "my savings goals", "reach my goal", "saving for",
+    )
+    if any(keyword in msg_lower for keyword in savings_keywords):
+        summary = request.financial_context
+        if summary is None:
+            summary = await backend_client.get_financial_summary(request.user_id)
+        review = SavingsGoalsAgent.review_goals(
+            user_id=request.user_id,
+            summary=summary,
+            query=request.message,
+        )
+        reply_parts = [review.headline, review.overview]
+        if review.recommendations:
+            reply_parts.append("Recommendations:")
+            reply_parts.extend(f"- {item}" for item in review.recommendations[:3])
+        if review.next_steps:
+            reply_parts.append("Next step:")
+            reply_parts.append(f"- {review.next_steps[0]}")
+        return ChatResponse(
+            agent_id="savings-goals",
+            agent_name="Savings & Goals Agent",
+            reply="\\n".join(reply_parts),
+            suggestions=[
+                "Review my savings progress",
+                "Which savings goal should I prioritise?",
+                "How much should I save each month?",
+            ],
+            data=review.model_dump(),
         )
 
     # Route financial wellbeing queries

@@ -28,8 +28,8 @@ class FinancialWellbeingAgent:
                     "We don't have enough transaction history for your account yet.",
                     "Connecting your account and recording your regular expenses helps unlock personalized guidance.",
                 ],
-                budget_recs=["Start by setting up budgets for essentials like Food and Transport."],
-                savings_recs=["Begin with a small emergency savings target (e.g. R200 - R500)."],
+                budget_recommendations=["Start by setting up budgets for essentials like Food and Transport."],
+                savings_recommendations=["Begin with a small emergency savings target (e.g. R200 - R500)."],
                 actionable_steps=[
                     "Add your first income or expense transaction.",
                     "Set a monthly cap on your highest spending category.",

@@ -78,11 +78,11 @@ class FinancialAdviceResponse(BaseModel):
     agent_id: str = "financial-wellbeing"
     user_id: str
     headline: str
-    insights: list[str]
-    budget_recommendations: list[str]
-    savings_recommendations: list[str]
-    actionable_steps: list[str]
-    vulnerability_alerts: list[str]
+    insights: list[str] = Field(default_factory=list)
+    budget_recommendations: list[str] = Field(default_factory=list)
+    savings_recommendations: list[str] = Field(default_factory=list)
+    actionable_steps: list[str] = Field(default_factory=list)
+    vulnerability_alerts: list[str] = Field(default_factory=list)
     timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 

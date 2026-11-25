@@ -68,6 +68,52 @@ class FinancialSummaryModel(BaseModel):
     model_config = {"populate_by_name": True}
 
 
+class BudgetPlanningRequest(BaseModel):
+    user_id: str
+    query: str | None = None
+    financial_context: FinancialSummaryModel | None = None
+
+
+class BudgetPlanningResponse(BaseModel):
+    agent_id: str = "budget-planning"
+    user_id: str
+    headline: str
+    overview: str
+    recommendations: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+class SavingsGoalsRequest(BaseModel):
+    user_id: str
+    query: str | None = None
+    financial_context: FinancialSummaryModel | None = None
+
+
+class SavingsGoalInsight(BaseModel):
+    goal_id: str
+    goal_name: str
+    target_amount: float
+    current_amount: float
+    remaining_amount: float
+    percentage_achieved: float
+    recommended_monthly_savings: float | None = None
+    target_date: str | None = None
+    is_completed: bool = False
+
+
+class SavingsGoalsResponse(BaseModel):
+    agent_id: str = "savings-goals"
+    user_id: str
+    headline: str
+    overview: str
+    insights: list[SavingsGoalInsight] = Field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
 class FinancialAdviceRequest(BaseModel):
     user_id: str
     query: str | None = None

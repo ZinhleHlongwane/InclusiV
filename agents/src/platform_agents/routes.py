@@ -1,12 +1,18 @@
 from fastapi import APIRouter, HTTPException
+from platform_agents.agents.budget_planning import BudgetPlanningAgent
 from platform_agents.agents.payments import PaymentsAgent
+from platform_agents.agents.savings_goals import SavingsGoalsAgent
 from platform_agents.agents.wellbeing import FinancialWellbeingAgent
 from platform_agents.client import BackendApiClient
 from platform_agents.models import (
+    BudgetPlanningRequest,
+    BudgetPlanningResponse,
     ChatRequest,
     ChatResponse,
     FinancialAdviceRequest,
     FinancialAdviceResponse,
+    SavingsGoalsRequest,
+    SavingsGoalsResponse,
     SandboxPaymentRequest,
     SandboxPaymentResponse,
     SpendingExplanationRequest,
@@ -17,10 +23,28 @@ router = APIRouter(prefix="/v1", tags=["agents"])
 
 AGENTS = [
     {
+        "id": "agent-orchestrator",
+        "name": "InclusiV Agent Orchestrator",
+        "status": "active",
+        "responsibility": "Classifies chat intent and delegates requests to one or more specialist agents.",
+    },
+    {
         "id": "financial-wellbeing",
         "name": "Financial Wellbeing Agent",
         "status": "active",
         "responsibility": "Spending explanations, budgeting, vulnerability alerts and savings guidance.",
+    },
+    {
+        "id": "budget-planning",
+        "name": "Budget Planning Agent",
+        "status": "active",
+        "responsibility": "Monthly budget reviews, category spending limits and practical spending recommendations.",
+    },
+    {
+        "id": "savings-goals",
+        "name": "Savings & Goals Agent",
+        "status": "active",
+        "responsibility": "Savings goal progress, target tracking and realistic contribution guidance.",
     },
     {
         "id": "payments-transactions",
@@ -76,6 +100,32 @@ async def explain_spending(request: SpendingExplanationRequest) -> SpendingExpla
     )
 
 
+@router.post("/agents/budget-planning/plan", response_model=BudgetPlanningResponse)
+async def create_budget_plan(request: BudgetPlanningRequest) -> BudgetPlanningResponse:
+    summary = request.financial_context
+    if summary is None:
+        summary = await backend_client.get_financial_summary(request.user_id)
+
+    return BudgetPlanningAgent.create_plan(
+        user_id=request.user_id,
+        summary=summary,
+        query=request.query,
+    )
+
+
+@router.post("/agents/savings-goals/review", response_model=SavingsGoalsResponse)
+async def review_savings_goals(request: SavingsGoalsRequest) -> SavingsGoalsResponse:
+    summary = request.financial_context
+    if summary is None:
+        summary = await backend_client.get_financial_summary(request.user_id)
+
+    return SavingsGoalsAgent.review_goals(
+        user_id=request.user_id,
+        summary=summary,
+        query=request.query,
+    )
+
+
 @router.post("/agents/payments/simulate", response_model=SandboxPaymentResponse)
 async def simulate_payment(request: SandboxPaymentRequest) -> SandboxPaymentResponse:
     try:
@@ -86,65 +136,7 @@ async def simulate_payment(request: SandboxPaymentRequest) -> SandboxPaymentResp
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest) -> ChatResponse:
-    msg_lower = request.message.lower()
+    from platform_agents.orchestrator import AgentOrchestrator
 
-    # Route payment simulator queries
-    if any(keyword in msg_lower for keyword in ["pay ", "send money", "transfer", "simulate payment"]):
-        return ChatResponse(
-            agent_id="payments-transactions",
-            agent_name="Payments and Transactions Agent",
-            reply=(
-                "I can help you simulate sandbox payments to test your transactions safely. "
-                "You can specify a recipient and an amount to preview how it will affect your category budget."
-            ),
-            suggestions=[
-                "Simulate R250 payment for Groceries",
-                "Simulate R50 payment for Transport",
-                "Review remaining category budgets",
-            ],
-            data={"action": "simulate_payment_prompt"},
-        )
-
-    # Route financial wellbeing queries
-    summary = request.financial_context
-    if summary is None:
-        summary = await backend_client.get_financial_summary(request.user_id)
-
-    advice = FinancialWellbeingAgent.generate_advice(
-        user_id=request.user_id,
-        summary=summary,
-        query=request.message,
-    )
-
-    # Format empathetic conversational reply
-    reply_parts = [advice.headline + "\n"]
-
-    if advice.vulnerability_alerts:
-        reply_parts.append("Important Alerts:")
-        for alert in advice.vulnerability_alerts:
-            reply_parts.append(f"- {alert}")
-        reply_parts.append("")
-
-    if advice.insights:
-        reply_parts.append("Key Insights:")
-        for insight in advice.insights[:2]:
-            reply_parts.append(f"- {insight}")
-        reply_parts.append("")
-
-    if advice.actionable_steps:
-        reply_parts.append("Recommended Next Step:")
-        reply_parts.append(f"- {advice.actionable_steps[0]}")
-
-    suggestions = [
-        "Explain my spending breakdown",
-        "How can I save more this month?",
-        "Check my budget limits",
-    ]
-
-    return ChatResponse(
-        agent_id="financial-wellbeing",
-        agent_name="Financial Wellbeing Agent",
-        reply="\n".join(reply_parts),
-        suggestions=suggestions,
-        data=advice.model_dump(),
-    )
+    orchestrator = AgentOrchestrator(backend_client=backend_client)
+    return await orchestrator.handle(request)

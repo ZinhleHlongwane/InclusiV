@@ -17,7 +17,7 @@ public static class SummaryEndpoints
             int? month,
             InclusivDbContext db) =>
         {
-            var user = await db.UserProfiles.FindAsync(userId);
+            var user = await db.Users.FindAsync(userId);
             if (user is null)
                 return Results.NotFound(new { error = "User profile not found." });
 

@@ -15,6 +15,7 @@ public class InclusivDbContext : DbContext
     }
 
     public DbSet<UserProfile> Users => Set<UserProfile>();
+    public DbSet<UserProfile> UserProfiles => Users;
     public DbSet<FinancialAccount> Accounts => Set<FinancialAccount>();
     public DbSet<FinancialTransaction> Transactions => Set<FinancialTransaction>();
     public DbSet<Budget> Budgets => Set<Budget>();

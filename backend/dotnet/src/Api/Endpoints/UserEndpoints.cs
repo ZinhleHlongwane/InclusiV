@@ -20,12 +20,12 @@ public static class UserEndpoints
                 return Results.BadRequest(new { error = "Full name is required." });
 
             var normalizedEmail = request.Email.Trim().ToLowerInvariant();
-            var exists = await db.UserProfiles.AnyAsync(u => u.Email == normalizedEmail);
+            var exists = await db.Users.AnyAsync(u => u.Email == normalizedEmail);
             if (exists)
                 return Results.Conflict(new { error = "A user profile with this email already exists." });
 
             var user = new UserProfile(Guid.NewGuid(), normalizedEmail, request.FullName);
-            db.UserProfiles.Add(user);
+            db.Users.Add(user);
             await db.SaveChangesAsync();
 
             var response = new UserProfileResponse(user.Id, user.Email, user.FullName, user.CreatedAt, user.UpdatedAt);
@@ -34,7 +34,7 @@ public static class UserEndpoints
 
         group.MapGet("/{id:guid}", async (Guid id, InclusivDbContext db) =>
         {
-            var user = await db.UserProfiles.FindAsync(id);
+            var user = await db.Users.FindAsync(id);
             if (user is null)
                 return Results.NotFound(new { error = "User profile not found." });
 
@@ -44,7 +44,7 @@ public static class UserEndpoints
         group.MapGet("/by-email/{email}", async (string email, InclusivDbContext db) =>
         {
             var normalizedEmail = email.Trim().ToLowerInvariant();
-            var user = await db.UserProfiles.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
             if (user is null)
                 return Results.NotFound(new { error = "User profile not found." });
 
@@ -56,7 +56,7 @@ public static class UserEndpoints
             if (string.IsNullOrWhiteSpace(request.FullName))
                 return Results.BadRequest(new { error = "Full name is required." });
 
-            var user = await db.UserProfiles.FindAsync(id);
+            var user = await db.Users.FindAsync(id);
             if (user is null)
                 return Results.NotFound(new { error = "User profile not found." });
 

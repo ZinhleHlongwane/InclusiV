@@ -24,7 +24,7 @@ public static class SavingsGoalEndpoints
             if (request.TargetAmount <= 0)
                 return Results.BadRequest(new { error = "Target amount must be greater than zero." });
 
-            var userExists = await db.UserProfiles.AnyAsync(u => u.Id == request.UserId);
+            var userExists = await db.Users.AnyAsync(u => u.Id == request.UserId);
             if (!userExists)
                 return Results.NotFound(new { error = "User profile not found." });
 

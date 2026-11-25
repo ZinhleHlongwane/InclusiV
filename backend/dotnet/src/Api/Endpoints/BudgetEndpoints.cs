@@ -21,7 +21,7 @@ public static class BudgetEndpoints
             if (request.MonthlyLimit <= 0)
                 return Results.BadRequest(new { error = "Monthly limit must be greater than zero." });
 
-            var userExists = await db.UserProfiles.AnyAsync(u => u.Id == request.UserId);
+            var userExists = await db.Users.AnyAsync(u => u.Id == request.UserId);
             if (!userExists)
                 return Results.NotFound(new { error = "User profile not found." });
 

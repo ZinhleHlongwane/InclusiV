@@ -127,6 +127,39 @@ async def chat(request: ChatRequest) -> ChatResponse:
             data={"action": "simulate_payment_prompt"},
         )
 
+    # Route budget planning queries before the general wellbeing fallback.
+    budget_keywords = ("budget plan", "plan my budget", "help me budget", "budget limits", "manage my budget")
+    if any(keyword in msg_lower for keyword in budget_keywords):
+        summary = request.financial_context
+        if summary is None:
+            summary = await backend_client.get_financial_summary(request.user_id)
+        plan = BudgetPlanningAgent.create_plan(
+            user_id=request.user_id,
+            summary=summary,
+            query=request.message,
+        )
+        reply_parts = [plan.headline, plan.overview]
+        if plan.warnings:
+            reply_parts.append("Warnings:")
+            reply_parts.extend(f"- {warning}" for warning in plan.warnings)
+        if plan.recommendations:
+            reply_parts.append("Recommendations:")
+            reply_parts.extend(f"- {item}" for item in plan.recommendations[:3])
+        if plan.next_steps:
+            reply_parts.append("Next step:")
+            reply_parts.append(f"- {plan.next_steps[0]}")
+        return ChatResponse(
+            agent_id="budget-planning",
+            agent_name="Budget Planning Agent",
+            reply="\\n".join(reply_parts),
+            suggestions=[
+                "Review my monthly budget",
+                "How can I reduce my spending?",
+                "Explain my spending breakdown",
+            ],
+            data=plan.model_dump(),
+        )
+
     # Route financial wellbeing queries
     summary = request.financial_context
     if summary is None:

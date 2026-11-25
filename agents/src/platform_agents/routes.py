@@ -24,7 +24,7 @@ router = APIRouter(prefix="/v1", tags=["agents"])
 AGENTS = [
     {
         "id": "agent-orchestrator",
-        "name": "InclusiV Agent Orchestrator",
+        "name": "MaliNovation Agent Orchestrator",
         "status": "active",
         "responsibility": "Builds validated specialist execution plans using optional model-assisted intent understanding with deterministic fallback.",
     },

@@ -1,8 +1,8 @@
 <div align="center">
 
-# InclusiV
+# MaliNovation
 
-**Financial guidance, made more accessible.**
+**Rethinking finance. Connecting possibilities.**
 
 An independent financial inclusion platform exploring how practical financial tools and coordinated specialist agents can help students and job seekers understand their money, build healthier financial habits and make more informed decisions.
 
@@ -16,15 +16,15 @@ An independent financial inclusion platform exploring how practical financial to
 
 </div>
 
-InclusiV is being developed around a simple idea: financial tools should be easier to understand and more useful to people who are studying, looking for work or managing irregular income.
+MaliNovation is being developed around a simple idea: financial tools should be easier to understand and more useful to people who are studying, looking for work or managing irregular income.
 
-The project combines a financial-records API, a calculation layer and a Python agent service. The current implementation focuses on the backend foundation and early agent workflows; the web interface and several planned integrations are still in progress.
+The project combines a financial-records API, a deterministic calculation layer and a Python agent service. The current implementation focuses on the backend foundation and agent workflows; the web interface and several planned integrations are still in progress.
 
 ## Why I built it
 
-Managing money can be especially difficult when income is limited or unpredictable. It is not always enough to record transactions — people also need a clearer picture of their spending, practical ways to plan a budget and support in understanding their options.
+Managing money can be especially difficult when income is limited or unpredictable. Recording transactions is useful, but people also need a clearer picture of their spending, practical ways to plan a budget and support in understanding their options.
 
-I wanted to explore how software engineering and AI-assisted workflows could bring those pieces together in one platform, while keeping the financial calculations and transaction records in a dedicated backend.
+I wanted to explore how software engineering and AI-assisted workflows could bring those pieces together in one platform, while keeping financial calculations and transaction records in a dedicated backend.
 
 ## What is implemented
 
@@ -43,41 +43,32 @@ The API uses Entity Framework Core with PostgreSQL persistence and database migr
 
 ### Financial calculation engine
 
-The domain layer contains a dedicated calculation engine for:
-
-- Account balances, with handling for pending and failed transactions.
-- Monthly income, expenses and net cash flow.
-- Expense breakdowns by category.
-- Budget usage, remaining amounts and budget health.
-- Savings-goal progress and suggested monthly contributions.
-- Consolidated monthly financial summaries.
-
-Keeping these calculations in the domain layer separates financial rules from the HTTP endpoint implementation.
+The domain layer contains a dedicated calculation engine for account balances, monthly income and expenses, net cash flow, category spending, budget usage and savings-goal progress. Keeping these calculations in the domain layer separates financial rules from HTTP endpoint implementation.
 
 ### Python agent service
 
-The FastAPI service currently exposes two active agent workflows:
+The FastAPI service includes these specialist workflows:
 
-**Financial Wellbeing Agent**
-- Reviews a user's financial summary.
-- Identifies negative cash flow and zero-buffer situations.
-- Highlights budgets that are approaching or exceeding their limits.
-- Explains spending by category.
-- Provides rule-based budgeting and savings suggestions.
+- **Financial Wellbeing Agent** — rule-based financial insights, spending explanations and practical next steps.
+- **Budget Planning Agent** — reviews monthly category budgets, spending limits and potential overspending.
+- **Savings & Goals Agent** — reviews savings targets, progress and contribution guidance.
+- **Payments and Transactions Agent** — provides an educational sandbox payment simulation; it does not move real money.
 
-**Payments and Transactions Agent**
-- Provides an educational payment simulation endpoint.
-- Validates the recipient and payment amount.
-- Returns a simulated transaction reference and result.
-- Offers a basic conversational route for payment-related prompts.
+The **MaliNovation Agent Orchestrator** coordinates relevant specialist workflows and can combine results. It supports partial failures so one unsuccessful specialist review does not automatically discard other successful results.
 
-The service also exposes an agent directory endpoint. Insurance guidance and financial research are listed as planned agents, not completed integrations.
+### Optional model-assisted intent planning
 
-> **Implementation note:** The current agent logic is rule-based. It does not call an external LLM, and the payment simulator does not move real money or connect to a live payment provider.
+When configured with an Azure OpenAI deployment, the orchestrator can use a model to classify a chat request into a structured specialist execution plan. The plan is validated against an allowlist before any specialist is invoked.
+
+- Deterministic keyword routing remains available when Azure settings are absent or model planning fails.
+- Low-confidence or invalid model output falls back to deterministic routing.
+- Ambiguous requests can return a clarification question.
+- Payment requests are kept separate from other specialist workflows.
+- The model receives the chat message for intent classification only; it is not given financial records or tools.
+
+Automated tests use mocked HTTP responses. A live Azure model deployment must be configured and tested separately before claiming live model inference works.
 
 ## Architecture
-
-The repository is organised into three application areas, supported by PostgreSQL and Docker Compose.
 
 ```mermaid
 flowchart TB
@@ -87,32 +78,35 @@ flowchart TB
     Domain[Domain Layer and Financial Calculation Engine]
     DB[(PostgreSQL)]
     Agents[Python FastAPI Agent Service]
-    Wellbeing[Financial Wellbeing Agent]
-    Payments[Payments and Transactions Agent]
+    Planner[Intent Planner]
+    Orchestrator[MaliNovation Agent Orchestrator]
+    Specialists[Budget, Savings, Wellbeing and Payment Agents]
 
     User --> Web
     Web --> API
     API --> Domain
     Domain --> DB
-    Agents --> Wellbeing
-    Agents --> Payments
-    Agents -->|Fetches financial summaries| API
+    Agents --> Planner
+    Planner --> Orchestrator
+    Orchestrator --> Specialists
+    Agents -->|Reads financial summaries when required| API
 ```
 
-The agent service can receive financial context directly in a request or retrieve a user's financial summary from the .NET API through its backend client.
+The .NET API remains responsible for financial records and deterministic calculations. The agent service coordinates specialist workflows; it does not replace backend validation.
 
 ## Technology stack
 
 | Area | Technologies |
 |---|---|
-| **Web application** | Next.js 15, React 19, TypeScript |
-| **Backend API** | C#, ASP.NET Core, .NET 10 |
-| **Domain and persistence** | Entity Framework Core, Npgsql |
-| **Database** | PostgreSQL 16 |
-| **Agent service** | Python 3.11+, FastAPI, Pydantic, HTTPX |
-| **API communication** | REST, JSON |
-| **Infrastructure** | Docker, Docker Compose |
-| **Cloud foundation** | Azure Bicep (initial infrastructure template) |
+| Web application | Next.js 15, React 19, TypeScript |
+| Backend API | C#, ASP.NET Core, .NET 10 |
+| Domain and persistence | Entity Framework Core, Npgsql |
+| Database | PostgreSQL 16 |
+| Agent service | Python 3.11+, FastAPI, Pydantic, HTTPX |
+| API communication | REST, JSON |
+| Infrastructure | Docker, Docker Compose |
+| Cloud foundation | Azure Bicep (initial infrastructure template) |
+| Optional model planning | Azure OpenAI chat completions |
 
 ## Run locally
 
@@ -121,22 +115,16 @@ The agent service can receive financial context directly in a request or retriev
 - Docker Desktop with Docker Compose
 - Git
 
-For running individual services outside Docker, install:
-- .NET 10 SDK
-- Python 3.11 or newer
-- Node.js 22 or newer
-- pnpm
+For running individual services outside Docker, install .NET 10 SDK, Python 3.11 or newer, Node.js 22 or newer and pnpm.
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/ZinhleHlongwane/InclusiV.git
-cd InclusiV
+git clone https://github.com/ZinhleHlongwane/MaliNovation.git
+cd MaliNovation
 ```
 
 ### 2. Configure environment variables
-
-Create your local environment file:
 
 ```bash
 cp .env.example .env
@@ -161,77 +149,63 @@ Docker Compose starts PostgreSQL, the .NET API, the Python agent service and the
 | Agent service health check | http://localhost:8000/health |
 | PostgreSQL | localhost:5432 |
 
-Stop the services with:
+Stop the services with `docker compose down`. To remove the local PostgreSQL volume as well, run `docker compose down -v`; this deletes the local database data.
 
-```bash
-docker compose down
+## Optional Azure model configuration
+
+Add these variables to your local repository-root `.env` file only:
+
+```dotenv
+AZURE_AI_ENDPOINT=
+AZURE_AI_API_KEY=
+AZURE_AI_DEPLOYMENT=
+AZURE_AI_API_VERSION=2024-10-21
 ```
 
-To remove the local PostgreSQL volume as well:
+Leave them blank to use deterministic routing. Never commit real API keys or put them in `.env.example`. Confirm the selected Azure model supports the configured API version and JSON response format before enabling it.
 
-```bash
-docker compose down -v
-```
-
-**Warning:** Removing the volume deletes the local database data.
+See [model-assisted planning](agents/MODEL_PLANNING.md) for the request flow, fallback behaviour and data-handling notes.
 
 ## API overview
 
-The current .NET API exposes the following route groups:
-
-| Resource | Base route | Purpose |
-|---|---|---|
-| Users | `/api/users` | Create, retrieve and update user profiles |
-| Accounts | `/api/accounts` | Manage financial accounts and balances |
-| Transactions | `/api/transactions` | Record and query income and expenses |
-| Budgets | `/api/budgets` | Manage monthly category budgets |
-| Savings goals | `/api/savings-goals` | Track savings targets and contributions |
-| Financial summary | `/api/financial-summary` | Retrieve a consolidated monthly summary |
+The .NET API exposes route groups for users, accounts, transactions, budgets, savings goals and monthly financial summaries.
 
 The agent service exposes:
 
 | Method | Route | Purpose |
 |---|---|---|
 | GET | `/health` | Agent service health check |
-| GET | `/v1/agents` | List available agents and their current status |
+| GET | `/v1/agents` | List specialist agents and status |
 | POST | `/v1/agents/financial-wellbeing/advice` | Generate rule-based financial guidance |
 | POST | `/v1/agents/financial-wellbeing/explain-spending` | Explain spending for a category |
+| POST | `/v1/agents/budget-planning/plan` | Create a budget review |
+| POST | `/v1/agents/savings-goals/review` | Review savings goals |
 | POST | `/v1/agents/payments/simulate` | Simulate an educational sandbox payment |
-| POST | `/v1/chat` | Route a basic chat request to an available workflow |
+| POST | `/v1/chat` | Plan and coordinate specialist workflows |
 
 ## Repository structure
 
 ```text
-InclusiV/
-├── agents/
-│   ├── src/platform_agents/
-│   │   ├── agents/              # Financial wellbeing and payment logic
-│   │   ├── client.py            # .NET API client
-│   │   ├── models.py            # Pydantic request and response models
-│   │   ├── routes.py            # FastAPI routes
-│   │   └── main.py              # FastAPI application
-│   └── pyproject.toml
-├── backend/
-│   └── dotnet/
-│       └── src/
-│           ├── Api/              # ASP.NET Core endpoints and persistence
-│           └── Domain/           # Financial entities and calculation rules
-├── frontend/
-│   └── web/                      # Next.js application
-├── infra/
-│   └── azure/                    # Initial Azure Bicep foundation
+MaliNovation/
+├── agents/                 # FastAPI agents and orchestration
+├── backend/dotnet/         # ASP.NET Core API and domain layer
+├── frontend/web/           # Next.js application foundation
+├── infra/azure/            # Initial Azure Bicep foundation
+├── docs/                   # Product, architecture and roadmap docs
+├── legacy/                 # Archived prototype material
 ├── .env.example
 └── docker-compose.yml
 ```
 
 ## Current limitations
 
-InclusiV is an active development project, not a production financial service.
+MaliNovation is an active development project, not a production financial service.
 
 - The web application is currently an early landing-page foundation; the full user-facing financial dashboard and workflows are not complete.
-- Agent responses are generated using application rules, not a connected language model.
+- Financial wellbeing, budget and savings guidance currently use application rules rather than generated model advice.
+- Model-assisted intent planning is optional and has only been covered by mocked automated tests so far; live Azure inference remains to be configured and verified.
 - The payment workflow is a simulation only. It does not initiate real payments or integrate with MTN MoMo or another live payment provider.
-- Insurance guidance and financial research agents are planned.
+- Insurance guidance and financial research agents are planned, not implemented.
 - Authentication, authorisation and production-grade security controls are not yet implemented.
 - The Azure template is an initial infrastructure foundation, not a complete production deployment.
 - Do not use the application as a source of regulated financial advice or as a replacement for a financial professional.
@@ -245,13 +219,14 @@ Never commit real credentials or personal financial information. Keep local secr
 - [x] Implement core account, transaction, budget and savings-goal endpoints.
 - [x] Add monthly financial calculations and summary responses.
 - [x] Create the FastAPI agent-service foundation.
-- [x] Implement rule-based financial wellbeing guidance.
+- [x] Implement financial wellbeing, budget-planning and savings-goal workflows.
 - [x] Add an educational sandbox payment workflow.
+- [x] Add multi-agent orchestration and optional model-assisted intent planning.
+- [ ] Configure and verify a live Azure model deployment.
 - [ ] Build the complete financial dashboard and connect the web application to the APIs.
 - [ ] Add authentication and role-based authorisation.
 - [ ] Expand automated tests across API, domain and agent workflows.
-- [ ] Add the insurance guidance and financial research workflows.
-- [ ] Evaluate safe, grounded LLM integration for conversational assistance.
+- [ ] Implement insurance guidance and financial research workflows.
 - [ ] Implement and test external payment-provider integrations in a sandbox environment.
 - [ ] Complete and validate the Azure deployment architecture.
 

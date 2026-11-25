@@ -117,7 +117,7 @@ class AgentOrchestrator:
         if execution_plan.needs_clarification:
             return ChatResponse(
                 agent_id="agent-orchestrator",
-                agent_name="InclusiV Agent Orchestrator",
+                agent_name="MaliNovation Agent Orchestrator",
                 reply=execution_plan.clarification_question or "Could you clarify what kind of financial help you need?",
                 suggestions=[
                     "Review my monthly budget",
@@ -183,7 +183,7 @@ class AgentOrchestrator:
         if not results:
             return ChatResponse(
                 agent_id="agent-orchestrator",
-                agent_name="InclusiV Agent Orchestrator",
+                agent_name="MaliNovation Agent Orchestrator",
                 reply="I couldn't complete the requested financial review just now. Please try again.",
                 suggestions=["Try your request again", "Review my financial wellbeing"],
                 data={"delegated_agents": [], "failed_agents": failures},
@@ -199,7 +199,7 @@ class AgentOrchestrator:
                 data={**result.model_dump(), "execution_plan": execution_plan.model_dump()},
             )
 
-        reply_parts = ["InclusiV coordinated the following specialist reviews."]
+        reply_parts = ["MaliNovation coordinated the following specialist reviews."]
         delegated_agents: list[str] = []
         agent_results: dict[str, dict] = {}
         for intent, result in results:
@@ -214,7 +214,7 @@ class AgentOrchestrator:
 
         return ChatResponse(
             agent_id="agent-orchestrator",
-            agent_name="InclusiV Agent Orchestrator",
+            agent_name="MaliNovation Agent Orchestrator",
             reply="\n\n".join(reply_parts),
             suggestions=[
                 "Review my monthly budget",

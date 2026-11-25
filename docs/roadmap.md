@@ -1,11 +1,10 @@
-# Implementation Roadmap
+# MaliNovation Implementation Roadmap
 
 ## Stage 0 — Foundation
-- [ ] Choose product name and identity.
-- [ ] Review prior InclusiV code and asset provenance.
-- [ ] Confirm reuse permissions and licensing.
-- [ ] Finalise domain model and API contracts.
-- [ ] Record architecture decisions.
+- [x] Choose the MaliNovation product name and identity.
+- [x] Review the existing codebase and record architecture decisions.
+- [ ] Confirm reuse permissions and licensing for archived prototype assets.
+- [x] Establish the initial domain model and API contracts.
 
 ## Stage 1 — Azure foundation
 - [ ] Create resource group and budget alerts.
@@ -13,28 +12,30 @@
 - [ ] Configure Key Vault and managed identity.
 - [ ] Deploy minimal .NET health endpoint.
 - [ ] Verify region, availability and costs before provisioning data services.
+- [ ] Configure and verify the optional Azure model deployment.
 
 ## Stage 2 — Core application
 - [ ] Authentication and profiles.
-- [ ] Income and expense records.
-- [ ] Categories and validation.
-- [ ] Budgets and savings goals.
-- [ ] Deterministic calculations.
-- [ ] Unit and integration tests.
+- [x] Income and expense records.
+- [x] Categories and validation.
+- [x] Budgets and savings goals.
+- [x] Deterministic calculations.
+- [ ] Expand unit and integration tests.
 
 ## Stage 3 — First agent
-- [ ] Financial Wellbeing Agent.
-- [ ] Secure model configuration.
-- [ ] Structured input/output.
-- [ ] Read-only financial tools.
-- [ ] Context management and evaluation scenarios.
+- [x] Financial Wellbeing Agent.
+- [x] Structured input/output.
+- [x] Read-only financial summary access.
+- [ ] Secure live model configuration and evaluation scenarios.
 
-## Stage 4 — Agents and A2A
+## Stage 4 — Agents and orchestration
+- [x] Budget Planning Agent.
+- [x] Savings & Goals Agent.
+- [x] Payments and Transactions sandbox workflow.
+- [x] Multi-agent orchestration and partial-failure handling.
 - [ ] Insurance Guidance Agent.
-- [ ] Payments and Transactions Agent.
 - [ ] Financial Research Agent.
-- [ ] Agent capability descriptions.
-- [ ] A2A delegation, error handling and workflow tests.
+- [ ] A2A delegation and interoperability tests.
 
 ## Stage 5 — MCP
 - [ ] Financial tools MCP server.
@@ -44,15 +45,15 @@
 - [ ] Permission and consent tests.
 
 ## Stage 6 — Security and observability
+- [ ] Authentication, authorisation and user-isolation tests.
 - [ ] Prompt-injection scenarios.
-- [ ] Authorisation and user-isolation tests.
 - [ ] Human approval workflow.
 - [ ] Agent evaluation dataset.
 - [ ] OpenTelemetry traces.
 - [ ] Usage, latency and failure monitoring.
 
 ## Stage 7 — Delivery
-- [ ] GitHub Actions CI.
+- [x] GitHub Actions CI foundation.
 - [ ] Azure deployment workflow.
 - [ ] Operational documentation.
 - [ ] Failure and recovery tests.

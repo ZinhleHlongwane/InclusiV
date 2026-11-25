@@ -16,6 +16,8 @@ services:
     build: ./backend/dotnet
     environment:
       ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${POSTGRES_DB:-financial_platform};Username=${POSTGRES_USER:-platform_user};Password=${POSTGRES_PASSWORD:-change-me-local-only}
+      ApplyMigrationsOnStartup: "true"
     ports: ["8080:8080"]
     depends_on:
       postgres:

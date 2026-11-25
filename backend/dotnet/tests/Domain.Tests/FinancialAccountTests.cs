@@ -9,13 +9,16 @@ public class FinancialAccountTests
     public void Constructor_WithValidAccount_CreatesAccount()
     {
         var id = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
         var account = new FinancialAccount(
             id,
+            userId,
             "My Savings",
             AccountType.SavingsAccount);
 
         Assert.Equal(id, account.Id);
+        Assert.Equal(userId, account.UserId);
         Assert.Equal("My Savings", account.Name);
         Assert.Equal(AccountType.SavingsAccount, account.Type);
         Assert.Equal(CurrencyCode.ZAR, account.Currency);
@@ -40,6 +43,15 @@ public class FinancialAccountTests
             CreateAccount(id: Guid.Empty));
 
         Assert.Equal("id", exception.ParamName);
+    }
+
+    [Fact]
+    public void Constructor_WithEmptyUserId_ThrowsArgumentException()
+    {
+        var exception = Assert.Throws<ArgumentException>(() =>
+            CreateAccount(userId: Guid.Empty));
+
+        Assert.Equal("userId", exception.ParamName);
     }
 
     [Theory]
@@ -114,6 +126,7 @@ public class FinancialAccountTests
 
     private static FinancialAccount CreateAccount(
         Guid? id = null,
+        Guid? userId = null,
         string name = "Test Account",
         AccountType type = AccountType.Cash,
         CurrencyCode currency = CurrencyCode.ZAR,
@@ -121,6 +134,7 @@ public class FinancialAccountTests
     {
         return new FinancialAccount(
             id ?? Guid.NewGuid(),
+            userId ?? Guid.NewGuid(),
             name,
             type,
             currency,

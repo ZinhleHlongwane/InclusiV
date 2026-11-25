@@ -3,6 +3,8 @@ namespace Domain.Transactions;
 public sealed class FinancialTransaction
 {
     public Guid Id { get; }
+    public Guid AccountId { get; }
+    public Guid UserId { get; }
     public TransactionType Type { get; }
     public TransactionStatus Status { get; }
     public decimal Amount { get; }
@@ -14,6 +16,8 @@ public sealed class FinancialTransaction
 
     public FinancialTransaction(
         Guid id,
+        Guid accountId,
+        Guid userId,
         TransactionType type,
         decimal amount,
         string description,
@@ -26,6 +30,14 @@ public sealed class FinancialTransaction
         if (id == Guid.Empty)
             throw new ArgumentException(
                 "Transaction ID cannot be empty.", nameof(id));
+
+        if (accountId == Guid.Empty)
+            throw new ArgumentException(
+                "Account ID cannot be empty.", nameof(accountId));
+
+        if (userId == Guid.Empty)
+            throw new ArgumentException(
+                "User ID cannot be empty.", nameof(userId));
 
         if (amount <= 0)
             throw new ArgumentOutOfRangeException(
@@ -48,6 +60,8 @@ public sealed class FinancialTransaction
             throw new ArgumentOutOfRangeException(nameof(category));
 
         Id = id;
+        AccountId = accountId;
+        UserId = userId;
         Type = type;
         Status = status;
         Amount = amount;

@@ -39,6 +39,8 @@ public class TransactionStatusTests
     {
         return new FinancialTransaction(
             Guid.NewGuid(),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
             TransactionType.Expense,
             250m,
             "Test transaction",

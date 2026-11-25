@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
+COPY src/Domain/Domain.csproj src/Domain/
 COPY src/Api/Api.csproj src/Api/
 RUN dotnet restore src/Api/Api.csproj
 COPY . .

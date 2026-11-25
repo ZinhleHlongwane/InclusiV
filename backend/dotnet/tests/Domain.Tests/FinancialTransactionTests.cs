@@ -8,10 +8,14 @@ public class FinancialTransactionTests
     public void Constructor_WithValidIncome_CreatesTransaction()
     {
         var id = Guid.NewGuid();
+        var accountId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         var date = new DateOnly(2026, 11, 16);
 
         var transaction = new FinancialTransaction(
             id,
+            accountId,
+            userId,
             TransactionType.Income,
             5000m,
             "Monthly allowance",
@@ -19,6 +23,8 @@ public class FinancialTransactionTests
             date);
 
         Assert.Equal(id, transaction.Id);
+        Assert.Equal(accountId, transaction.AccountId);
+        Assert.Equal(userId, transaction.UserId);
         Assert.Equal(TransactionType.Income, transaction.Type);
         Assert.Equal(5000m, transaction.Amount);
         Assert.Equal(CurrencyCode.ZAR, transaction.Currency);
@@ -30,14 +36,20 @@ public class FinancialTransactionTests
     [Fact]
     public void Constructor_WithValidExpense_CreatesTransaction()
     {
+        var accountId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         var transaction = new FinancialTransaction(
             Guid.NewGuid(),
+            accountId,
+            userId,
             TransactionType.Expense,
             250m,
             "Groceries",
             TransactionCategory.Food,
             new DateOnly(2026, 11, 16));
 
+        Assert.Equal(accountId, transaction.AccountId);
+        Assert.Equal(userId, transaction.UserId);
         Assert.Equal(TransactionType.Expense, transaction.Type);
         Assert.Equal(250m, transaction.Amount);
         Assert.Equal(TransactionCategory.Food, transaction.Category);
@@ -84,6 +96,24 @@ public class FinancialTransactionTests
             CreateTransaction(id: Guid.Empty));
 
         Assert.Equal("id", exception.ParamName);
+    }
+
+    [Fact]
+    public void Constructor_WithEmptyAccountId_ThrowsArgumentException()
+    {
+        var exception = Assert.Throws<ArgumentException>(() =>
+            CreateTransaction(accountId: Guid.Empty));
+
+        Assert.Equal("accountId", exception.ParamName);
+    }
+
+    [Fact]
+    public void Constructor_WithEmptyUserId_ThrowsArgumentException()
+    {
+        var exception = Assert.Throws<ArgumentException>(() =>
+            CreateTransaction(userId: Guid.Empty));
+
+        Assert.Equal("userId", exception.ParamName);
     }
 
     [Theory]
@@ -171,6 +201,8 @@ public class FinancialTransactionTests
 
         var transaction = new FinancialTransaction(
             Guid.NewGuid(),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
             TransactionType.Expense,
             150m,
             "Historical purchase",
@@ -187,6 +219,8 @@ public class FinancialTransactionTests
 
         var transaction = new FinancialTransaction(
             Guid.NewGuid(),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
             TransactionType.Expense,
             300m,
             "Scheduled payment",
@@ -198,6 +232,8 @@ public class FinancialTransactionTests
 
     private static FinancialTransaction CreateTransaction(
         Guid? id = null,
+        Guid? accountId = null,
+        Guid? userId = null,
         TransactionType type = TransactionType.Expense,
         decimal amount = 100m,
         string description = "Test transaction",
@@ -207,6 +243,8 @@ public class FinancialTransactionTests
     {
         return new FinancialTransaction(
             id ?? Guid.NewGuid(),
+            accountId ?? Guid.NewGuid(),
+            userId ?? Guid.NewGuid(),
             type,
             amount,
             description,

@@ -62,7 +62,7 @@ def test_orchestrator_delegates_compound_request_to_multiple_agents() -> None:
     )
 
     assert response.agent_id == "agent-orchestrator"
-    assert response.agent_name == "InclusiV Agent Orchestrator"
+    assert response.agent_name == "MaliNovation Agent Orchestrator"
     assert response.data is not None
     assert response.data["delegated_agents"] == ["budget-planning", "savings-goals"]
     assert "budget-planning" in response.data["results"]

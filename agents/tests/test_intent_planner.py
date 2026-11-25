@@ -176,3 +176,36 @@ def test_model_can_request_clarification() -> None:
 
     assert plan.needs_clarification is True
     assert plan.clarification_question == "Are you asking about a budget or a savings goal?"
+
+def test_model_can_return_clarification_without_selecting_an_agent() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "content": (
+                                '{"intents":[],"confidence":0.4,'
+                                '"needs_clarification":true,'
+                                '"clarification_question":"Do you mean your budget or savings goal?",'
+                                '"rationale":"The request is ambiguous."}'
+                            )
+                        }
+                    }
+                ]
+            },
+        )
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    planner = IntentPlanner(
+        endpoint="https://example.test",
+        api_key="test-key",
+        deployment="test-model",
+        http_client=client,
+    )
+    plan = asyncio.run(planner.create_plan("Can you help me with it?"))
+    asyncio.run(client.aclose())
+
+    assert plan.needs_clarification is True
+    assert plan.intents == []

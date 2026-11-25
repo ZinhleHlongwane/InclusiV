@@ -37,7 +37,7 @@ class AgentOrchestrator:
         "financial overview", "spending breakdown", "can i afford", "affordability",
     )
     PAYMENT_TERMS = (
-        "simulate payment", "make a payment", "pay ", "send money", "transfer money",
+        "simulate payment", "simulate a payment", "make a payment", "pay ", "send money", "transfer money",
     )
 
     def __init__(self, backend_client: BackendApiClient | None = None) -> None:

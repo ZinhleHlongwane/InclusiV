@@ -60,7 +60,7 @@ def test_orchestrator_delegates_compound_request_to_two_agents() -> None:
 
 
 def test_orchestrator_routes_budget_request_to_budget_agent() -> None:
-    response = __import__("asyncio").run(
+    response = asyncio.run(
         AgentOrchestrator().handle(
             ChatRequest(
                 user_id="user-123",

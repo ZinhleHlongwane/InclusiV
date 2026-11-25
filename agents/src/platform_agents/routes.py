@@ -173,7 +173,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
         return ChatResponse(
             agent_id="budget-planning",
             agent_name="Budget Planning Agent",
-            reply="\\n".join(reply_parts),
+            reply="\n".join(reply_parts),
             suggestions=[
                 "Review my monthly budget",
                 "How can I reduce my spending?",
@@ -206,7 +206,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
         return ChatResponse(
             agent_id="savings-goals",
             agent_name="Savings & Goals Agent",
-            reply="\\n".join(reply_parts),
+            reply="\n".join(reply_parts),
             suggestions=[
                 "Review my savings progress",
                 "Which savings goal should I prioritise?",

@@ -11,7 +11,7 @@ public static class TransactionEndpoints
     {
         var group = routes.MapGroup("/api/transactions").WithTags("Transactions");
 
-        group.MapPost("/", async (CreateTransactionRequest request, InclusivDbContext db) =>
+        group.MapPost("/", async (CreateTransactionRequest request, MaliNovationDbContext db) =>
         {
             if (request.AccountId == Guid.Empty)
                 return Results.BadRequest(new { error = "Account ID cannot be empty." });
@@ -84,7 +84,7 @@ public static class TransactionEndpoints
             DateOnly? from,
             DateOnly? to,
             string? status,
-            InclusivDbContext db) =>
+            MaliNovationDbContext db) =>
         {
             var query = db.Transactions.Where(t => t.UserId == userId);
 
@@ -127,7 +127,7 @@ public static class TransactionEndpoints
             return Results.Ok(response);
         });
 
-        group.MapGet("/{id:guid}", async (Guid id, InclusivDbContext db) =>
+        group.MapGet("/{id:guid}", async (Guid id, MaliNovationDbContext db) =>
         {
             var tx = await db.Transactions.FindAsync(id);
             if (tx is null)
@@ -149,7 +149,7 @@ public static class TransactionEndpoints
             return Results.Ok(response);
         });
 
-        group.MapPatch("/{id:guid}/status", async (Guid id, UpdateTransactionStatusRequest request, InclusivDbContext db) =>
+        group.MapPatch("/{id:guid}/status", async (Guid id, UpdateTransactionStatusRequest request, MaliNovationDbContext db) =>
         {
             if (!Enum.TryParse<TransactionStatus>(request.Status, true, out var newStatus))
                 return Results.BadRequest(new { error = $"Invalid transaction status. Valid values: {string.Join(", ", Enum.GetNames<TransactionStatus>())}" });
@@ -177,7 +177,7 @@ public static class TransactionEndpoints
             return Results.Ok(response);
         });
 
-        group.MapDelete("/{id:guid}", async (Guid id, InclusivDbContext db) =>
+        group.MapDelete("/{id:guid}", async (Guid id, MaliNovationDbContext db) =>
         {
             var tx = await db.Transactions.FindAsync(id);
             if (tx is null)

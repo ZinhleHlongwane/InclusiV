@@ -13,7 +13,7 @@ public static class AccountEndpoints
     {
         var group = routes.MapGroup("/api/accounts").WithTags("Accounts");
 
-        group.MapPost("/", async (CreateAccountRequest request, InclusivDbContext db) =>
+        group.MapPost("/", async (CreateAccountRequest request, MaliNovationDbContext db) =>
         {
             if (request.UserId == Guid.Empty)
                 return Results.BadRequest(new { error = "User ID cannot be empty." });
@@ -53,7 +53,7 @@ public static class AccountEndpoints
             return Results.Created($"/api/accounts/{account.Id}", response);
         });
 
-        group.MapGet("/user/{userId:guid}", async (Guid userId, InclusivDbContext db) =>
+        group.MapGet("/user/{userId:guid}", async (Guid userId, MaliNovationDbContext db) =>
         {
             var accounts = await db.Accounts
                 .Where(a => a.UserId == userId)
@@ -81,7 +81,7 @@ public static class AccountEndpoints
             return Results.Ok(response);
         });
 
-        group.MapGet("/{id:guid}", async (Guid id, InclusivDbContext db) =>
+        group.MapGet("/{id:guid}", async (Guid id, MaliNovationDbContext db) =>
         {
             var account = await db.Accounts.FindAsync(id);
             if (account is null)
@@ -105,7 +105,7 @@ public static class AccountEndpoints
             return Results.Ok(response);
         });
 
-        group.MapDelete("/{id:guid}", async (Guid id, InclusivDbContext db) =>
+        group.MapDelete("/{id:guid}", async (Guid id, MaliNovationDbContext db) =>
         {
             var account = await db.Accounts.FindAsync(id);
             if (account is null)

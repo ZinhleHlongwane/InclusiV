@@ -13,7 +13,7 @@ public static class BudgetEndpoints
     {
         var group = routes.MapGroup("/api/budgets").WithTags("Budgets");
 
-        group.MapPost("/", async (CreateBudgetRequest request, InclusivDbContext db) =>
+        group.MapPost("/", async (CreateBudgetRequest request, MaliNovationDbContext db) =>
         {
             if (request.UserId == Guid.Empty)
                 return Results.BadRequest(new { error = "User ID cannot be empty." });
@@ -74,7 +74,7 @@ public static class BudgetEndpoints
             Guid userId,
             int? year,
             int? month,
-            InclusivDbContext db) =>
+            MaliNovationDbContext db) =>
         {
             var now = DateTimeOffset.UtcNow;
             var targetYear = year ?? now.Year;
@@ -119,7 +119,7 @@ public static class BudgetEndpoints
             return Results.Ok(response);
         });
 
-        group.MapPut("/{id:guid}", async (Guid id, UpdateBudgetLimitRequest request, InclusivDbContext db) =>
+        group.MapPut("/{id:guid}", async (Guid id, UpdateBudgetLimitRequest request, MaliNovationDbContext db) =>
         {
             if (request.MonthlyLimit <= 0)
                 return Results.BadRequest(new { error = "Monthly limit must be greater than zero." });
@@ -156,7 +156,7 @@ public static class BudgetEndpoints
             return Results.Ok(response);
         });
 
-        group.MapDelete("/{id:guid}", async (Guid id, InclusivDbContext db) =>
+        group.MapDelete("/{id:guid}", async (Guid id, MaliNovationDbContext db) =>
         {
             var budget = await db.Budgets.FindAsync(id);
             if (budget is null)

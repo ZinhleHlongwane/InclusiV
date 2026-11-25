@@ -15,7 +15,7 @@ public static class SummaryEndpoints
             Guid userId,
             int? year,
             int? month,
-            InclusivDbContext db) =>
+            MaliNovationDbContext db) =>
         {
             var user = await db.Users.FindAsync(userId);
             if (user is null)

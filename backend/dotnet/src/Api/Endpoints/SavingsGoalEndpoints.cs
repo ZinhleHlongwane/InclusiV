@@ -13,7 +13,7 @@ public static class SavingsGoalEndpoints
     {
         var group = routes.MapGroup("/api/savings-goals").WithTags("SavingsGoals");
 
-        group.MapPost("/", async (CreateSavingsGoalRequest request, InclusivDbContext db) =>
+        group.MapPost("/", async (CreateSavingsGoalRequest request, MaliNovationDbContext db) =>
         {
             if (request.UserId == Guid.Empty)
                 return Results.BadRequest(new { error = "User ID cannot be empty." });
@@ -64,7 +64,7 @@ public static class SavingsGoalEndpoints
             return Results.Created($"/api/savings-goals/{goal.Id}", response);
         });
 
-        group.MapGet("/user/{userId:guid}", async (Guid userId, InclusivDbContext db) =>
+        group.MapGet("/user/{userId:guid}", async (Guid userId, MaliNovationDbContext db) =>
         {
             var goals = await db.SavingsGoals
                 .Where(g => g.UserId == userId)
@@ -96,7 +96,7 @@ public static class SavingsGoalEndpoints
             return Results.Ok(response);
         });
 
-        group.MapPost("/{id:guid}/contribute", async (Guid id, ContributeSavingsRequest request, InclusivDbContext db) =>
+        group.MapPost("/{id:guid}/contribute", async (Guid id, ContributeSavingsRequest request, MaliNovationDbContext db) =>
         {
             if (request.Amount <= 0)
                 return Results.BadRequest(new { error = "Contribution amount must be greater than zero." });
@@ -129,7 +129,7 @@ public static class SavingsGoalEndpoints
             return Results.Ok(response);
         });
 
-        group.MapPut("/{id:guid}", async (Guid id, UpdateSavingsGoalRequest request, InclusivDbContext db) =>
+        group.MapPut("/{id:guid}", async (Guid id, UpdateSavingsGoalRequest request, MaliNovationDbContext db) =>
         {
             if (string.IsNullOrWhiteSpace(request.Name))
                 return Results.BadRequest(new { error = "Goal name is required." });
@@ -165,7 +165,7 @@ public static class SavingsGoalEndpoints
             return Results.Ok(response);
         });
 
-        group.MapDelete("/{id:guid}", async (Guid id, InclusivDbContext db) =>
+        group.MapDelete("/{id:guid}", async (Guid id, MaliNovationDbContext db) =>
         {
             var goal = await db.SavingsGoals.FindAsync(id);
             if (goal is null)

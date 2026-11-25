@@ -10,4 +10,4 @@ app.include_router(router)
 
 @app.get("/health", tags=["health"])
 async def health() -> dict[str, str]:
-    return {"service": "agent-service", "status": "healthy", "stage": "multi-agent-orchestration"}
+    return {"service": "agent-service", "status": "healthy", "stage": "model-assisted-intent-planning"}

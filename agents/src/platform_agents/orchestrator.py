@@ -1,7 +1,6 @@
 from enum import StrEnum
 
 from platform_agents.agents.budget_planning import BudgetPlanningAgent
-from platform_agents.agents.payments import PaymentsAgent
 from platform_agents.agents.savings_goals import SavingsGoalsAgent
 from platform_agents.agents.wellbeing import FinancialWellbeingAgent
 from platform_agents.client import BackendApiClient

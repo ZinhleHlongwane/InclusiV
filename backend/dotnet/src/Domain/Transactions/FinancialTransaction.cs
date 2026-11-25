@@ -6,7 +6,7 @@ public sealed class FinancialTransaction
     public Guid AccountId { get; }
     public Guid UserId { get; }
     public TransactionType Type { get; }
-    public TransactionStatus Status { get; }
+    public TransactionStatus Status { get; private set; }
     public decimal Amount { get; }
     public CurrencyCode Currency { get; }
     public string Description { get; }
@@ -70,5 +70,13 @@ public sealed class FinancialTransaction
         Category = category;
         TransactionDate = transactionDate;
         RecordedAt = recordedAt ?? DateTimeOffset.UtcNow;
+    }
+
+    public void UpdateStatus(TransactionStatus newStatus)
+    {
+        if (!Enum.IsDefined(newStatus))
+            throw new ArgumentOutOfRangeException(nameof(newStatus));
+
+        Status = newStatus;
     }
 }

@@ -230,6 +230,27 @@ public class FinancialTransactionTests
         Assert.Equal(futureDate, transaction.TransactionDate);
     }
 
+    [Fact]
+    public void UpdateStatus_WithValidStatus_UpdatesStatus()
+    {
+        var transaction = CreateTransaction();
+
+        transaction.UpdateStatus(TransactionStatus.Pending);
+
+        Assert.Equal(TransactionStatus.Pending, transaction.Status);
+    }
+
+    [Fact]
+    public void UpdateStatus_WithInvalidStatus_ThrowsArgumentOutOfRangeException()
+    {
+        var transaction = CreateTransaction();
+
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            transaction.UpdateStatus((TransactionStatus)999));
+
+        Assert.Equal("newStatus", exception.ParamName);
+    }
+
     private static FinancialTransaction CreateTransaction(
         Guid? id = null,
         Guid? accountId = null,

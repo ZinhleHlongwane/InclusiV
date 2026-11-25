@@ -1,4 +1,5 @@
 using Api.Data;
+using Api.Endpoints;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,10 +35,17 @@ app.MapGet("/", () => Results.Ok(new
 {
     service = "Financial Inclusion Platform API",
     status = "running",
-    stage = "data-architecture"
+    stage = "core-rest-apis"
 }));
 
 app.MapHealthChecks("/health");
+
+app.MapUserEndpoints();
+app.MapAccountEndpoints();
+app.MapTransactionEndpoints();
+app.MapBudgetEndpoints();
+app.MapSavingsGoalEndpoints();
+app.MapSummaryEndpoints();
 
 app.Run();
 

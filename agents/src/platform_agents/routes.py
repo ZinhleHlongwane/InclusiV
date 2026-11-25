@@ -26,7 +26,7 @@ AGENTS = [
         "id": "agent-orchestrator",
         "name": "InclusiV Agent Orchestrator",
         "status": "active",
-        "responsibility": "Classifies chat intent and delegates requests to one or more specialist agents.",
+        "responsibility": "Builds validated specialist execution plans using optional model-assisted intent understanding with deterministic fallback.",
     },
     {
         "id": "financial-wellbeing",

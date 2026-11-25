@@ -85,7 +85,7 @@ class AgentOrchestrator:
             parts.extend(["Recommendations:", *(f"- {item}" for item in plan.recommendations[:3])])
         if plan.next_steps:
             parts.extend(["Next step:", f"- {plan.next_steps[0]}"])
-        return "\\n".join(parts)
+        return "\n".join(parts)
 
     @staticmethod
     def _format_savings(review) -> str:
@@ -94,7 +94,7 @@ class AgentOrchestrator:
             parts.extend(["Recommendations:", *(f"- {item}" for item in review.recommendations[:3])])
         if review.next_steps:
             parts.extend(["Next step:", f"- {review.next_steps[0]}"])
-        return "\\n".join(parts)
+        return "\n".join(parts)
 
     @staticmethod
     def _format_wellbeing(advice) -> str:
@@ -105,7 +105,7 @@ class AgentOrchestrator:
             parts.extend(["Key Insights:", *(f"- {item}" for item in advice.insights[:2])])
         if advice.actionable_steps:
             parts.extend(["Recommended Next Step:", f"- {advice.actionable_steps[0]}"])
-        return "\\n".join(parts)
+        return "\n".join(parts)
 
     async def handle(self, request: ChatRequest) -> ChatResponse:
         intents = self.classify_intents(request.message)
@@ -196,7 +196,7 @@ class AgentOrchestrator:
         return ChatResponse(
             agent_id="agent-orchestrator",
             agent_name="InclusiV Agent Orchestrator",
-            reply="\\n\\n".join(reply_parts),
+            reply="\n\n".join(reply_parts),
             suggestions=[
                 "Review my monthly budget",
                 "Review my savings progress",

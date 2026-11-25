@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class IntentExecutionPlan(BaseModel):
     """Validated, tool-free plan describing which specialist agents to invoke."""
 
-    intents: list[str] = Field(min_length=1)
+    intents: list[str] = Field(default_factory=list)
     confidence: float = Field(ge=0.0, le=1.0)
     needs_clarification: bool = False
     clarification_question: str | None = None
@@ -166,6 +166,9 @@ class IntentPlanner:
         if not plan.intents or any(intent not in self.ALLOWED_INTENTS for intent in plan.intents):
             return fallback
 
+        if plan.confidence < self.MIN_CONFIDENCE:
+            return fallback
+
         # A payment request must never be combined with other specialist work.
         if "payments-transactions" in plan.intents:
             if len(plan.intents) != 1:
@@ -174,6 +177,4 @@ class IntentPlanner:
 
         # Deduplicate while retaining the model's intended execution order.
         plan.intents = list(dict.fromkeys(plan.intents))
-        if plan.confidence < self.MIN_CONFIDENCE:
-            return fallback
         return plan

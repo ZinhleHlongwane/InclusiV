@@ -23,6 +23,12 @@ router = APIRouter(prefix="/v1", tags=["agents"])
 
 AGENTS = [
     {
+        "id": "agent-orchestrator",
+        "name": "InclusiV Agent Orchestrator",
+        "status": "active",
+        "responsibility": "Classifies chat intent and delegates requests to one or more specialist agents.",
+    },
+    {
         "id": "financial-wellbeing",
         "name": "Financial Wellbeing Agent",
         "status": "active",
